@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 using WebAPIDemo.Models;
 using Microsoft.Extensions.Configuration;
 using WebAPIDemo.Context;
+using WebAPIDemo.Healpers;
 
 namespace WebAPIDemo.Controllers
 {
@@ -38,7 +39,16 @@ namespace WebAPIDemo.Controllers
         [HttpGet("Register")]
         public async Task<IActionResult> RegisterUserAsync([FromBody]User user)
         {
-            var t = _context.Users.Where(x => x.Email.Equals(user.Email)).FirstOrDefault();
+            if(!Validation.IsValidEmail(user.Email))
+            {
+                return BadRequest("Enter valid email.");
+            }
+
+            if(string.IsNullOrEmpty(user.Password) || user.Password.Trim().Length < 6)
+            {
+                return BadRequest("Password not valid. Password should be 6 character in length.");
+            }
+
             if (_context.Users.Where(x => x.Email.Equals(user.Email)).FirstOrDefault() != null)
                 return BadRequest("User already registered.");
 
@@ -58,6 +68,16 @@ namespace WebAPIDemo.Controllers
         [HttpPost("Login")]
         public IActionResult Login([FromBody]AuthenticateModel authenticateModel)
         {
+            if (!Validation.IsValidEmail(authenticateModel.Email))
+            {
+                return BadRequest("Enter valid email.");
+            }
+
+            if (string.IsNullOrEmpty(authenticateModel.Password) || authenticateModel.Password.Trim().Length < 6)
+            {
+                return BadRequest("Password not valid. Password should be 6 character in length.");
+            }
+
             User user = _context.Users.Where(x => x.Email.Equals(authenticateModel.Email)).FirstOrDefault();
 
             if (user != null && user.Password.Equals(authenticateModel.Password))

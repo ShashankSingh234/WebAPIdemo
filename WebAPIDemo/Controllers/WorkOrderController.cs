@@ -107,10 +107,16 @@ namespace WebAPIDemo.Controllers
             wo.AssignedUserId = updateWorkOrder.AssignedUserId;
             wo.FacilityId = updateWorkOrder.FacilityId;
             wo.UnitId = updateWorkOrder.UnitId;
+            try
+            {
+                await _context.SaveChangesAsync();
 
-            await _context.SaveChangesAsync();
-
-            return Ok($"WorkOrder {updateWorkOrder.WorkOrderId} updated successfully.");
+                return Ok($"WorkOrder {updateWorkOrder.WorkOrderId} updated successfully.");
+            }
+            catch(DbUpdateException ex)
+            {
+                return BadRequest(ex.InnerException.Message);
+            }
         }
 
         /// <summary>
