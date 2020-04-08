@@ -13,6 +13,7 @@ using WebAPIDemo.Context;
 using System.Reflection;
 using System.IO;
 using System;
+using System.Collections.Generic;
 
 namespace WebAPIDemo
 {
@@ -28,10 +29,10 @@ namespace WebAPIDemo
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            //services.AddDbContext<DatabaseContext>(opt =>
-            //   opt.UseSqlServer(Configuration["DBConnectionString:ConnectionString"]));
             services.AddDbContext<DatabaseContext>(opt =>
-               opt.UseInMemoryDatabase("DB"));
+               opt.UseSqlServer(Configuration["DBConnectionString:ConnectionString"]));
+            //services.AddDbContext<DatabaseContext>(opt =>
+            //   opt.UseInMemoryDatabase("DB"));
             SetupJWTServices(services);
             services.AddControllers();
 
@@ -39,41 +40,73 @@ namespace WebAPIDemo
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Demo API", Version = "v1" });
+                //c.OperationFilter<AuthorizationHeaderParameterOperationFilter>();
+
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Description = @"JWT Authorization header using the Bearer scheme.  
+                      Enter 'Bearer' [space] and then your token in the text input below.
+                      Example: 'Bearer 12345abcdef'",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer"
+                });
+
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement()
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                        Reference = new OpenApiReference
+                          {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                          },
+                          Scheme = "oauth2",
+                          Name = "Bearer",
+                          In = ParameterLocation.Header,
+
+                        },
+                        new List<string>()
+                    }
+                });
 
                 // Set the comments path for the Swagger JSON and UI.
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 c.IncludeXmlComments(xmlPath);
+
             });
         }
 
         private void SetupJWTServices(IServiceCollection services)
         {
-           services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-          .AddJwtBearer(options =>
-          {
-              options.TokenValidationParameters = new TokenValidationParameters
-              {
-                  ValidateIssuer = true,
-                  ValidateAudience = true,
-                  ValidateIssuerSigningKey = true,
-                  ValidIssuer = Configuration["Jwt:Issuer"],
-                  ValidAudience = Configuration["Jwt:Issuer"],
-                  IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
-              };
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+           .AddJwtBearer(options =>
+           {
+               options.TokenValidationParameters = new TokenValidationParameters
+               {
+                   ValidateIssuer = true,
+                   ValidateAudience = true,
+                   ValidateIssuerSigningKey = true,
+                   ValidIssuer = Configuration["Jwt:Issuer"],
+                   ValidAudience = Configuration["Jwt:Issuer"],
+                   IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
+               };
 
-              //options.Events = new JwtBearerEvents
-              //{
-              //    OnAuthenticationFailed = context =>
-              //    {
-              //        if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
-              //        {
-              //            context.Response.Headers.Add("Token-Expired", "true");
-              //        }
-              //        return Task.CompletedTask;
-              //    }
-              //};
-          });
+               //options.Events = new JwtBearerEvents
+               //{
+               //    OnAuthenticationFailed = context =>
+               //    {
+               //        if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
+               //        {
+               //            context.Response.Headers.Add("Token-Expired", "true");
+               //        }
+               //        return Task.CompletedTask;
+               //    }
+               //};
+           });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

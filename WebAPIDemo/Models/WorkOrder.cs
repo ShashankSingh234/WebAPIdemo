@@ -40,4 +40,14 @@ namespace WebAPIDemo.Models
         public int? FacilityId { get; set; }
         public int? UnitId { get; set; }
     }
+
+    public class GetWorkOrder
+    {
+        public long? WorkOrderId { get; set; }
+        public string Title { get; set; }
+        public string Description { get; set; }
+        public long? AssignedUserId { get; set; }
+        public int? FacilityId { get; set; }
+        public int? UnitId { get; set; }
+    }
 }

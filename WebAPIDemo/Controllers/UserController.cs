@@ -36,7 +36,7 @@ namespace WebAPIDemo.Controllers
         /// <param name="user"></param>
         /// <returns></returns>
         [AllowAnonymous]
-        [HttpGet("Register")]
+        [HttpPost("Register")]
         public async Task<IActionResult> RegisterUserAsync([FromBody]User user)
         {
             if(!Validation.IsValidEmail(user.Email))

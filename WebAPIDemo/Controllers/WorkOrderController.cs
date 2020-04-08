@@ -36,12 +36,22 @@ namespace WebAPIDemo.Controllers
         {
             WorkOrder wo = _context.WorkOrder.SingleOrDefault(wo => wo.WorkOrderId.Equals(workOrderId));
 
-            if(wo == null)
+            if (wo == null)
             {
                 return NotFound($"WorkOrder {workOrderId} not found.");
             }
 
-            return Ok(wo);
+            GetWorkOrder getWorkOrder = new GetWorkOrder()
+            {
+                WorkOrderId = wo.WorkOrderId,
+                Title = wo.Title,
+                Description = wo.Description,
+                AssignedUserId = wo.AssignedUserId,
+                FacilityId = wo.FacilityId,
+                UnitId = wo.UnitId
+            };
+
+            return Ok(getWorkOrder);
         }
 
         /// <summary>
@@ -53,9 +63,22 @@ namespace WebAPIDemo.Controllers
         [HttpGet("GetWorkOrderList")]
         public IActionResult GetWorkOrderList(int pageNumber, int pageSize)
         {
+            if (pageNumber <= 0)
+            {
+                return BadRequest("Page number should be greater than 0.");
+            }
+
             List<WorkOrder> woList = _context.WorkOrder.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
 
-            return Ok(woList);
+            return Ok(woList.Select(x => new GetWorkOrder()
+            {
+                WorkOrderId = x.WorkOrderId,
+                Title = x.Title,
+                Description = x.Description,
+                AssignedUserId = x.AssignedUserId,
+                FacilityId = x.FacilityId,
+                UnitId = x.UnitId
+            }).ToList());
         }
 
         /// <summary>
@@ -81,7 +104,7 @@ namespace WebAPIDemo.Controllers
                 await _context.SaveChangesAsync();
                 return Ok($"WorkOrder {workOrder.WorkOrderId} added successfully.");
             }
-            catch(DbUpdateException ex)
+            catch (DbUpdateException ex)
             {
                 return BadRequest(ex.InnerException.Message);
             }
@@ -113,7 +136,7 @@ namespace WebAPIDemo.Controllers
 
                 return Ok($"WorkOrder {updateWorkOrder.WorkOrderId} updated successfully.");
             }
-            catch(DbUpdateException ex)
+            catch (DbUpdateException ex)
             {
                 return BadRequest(ex.InnerException.Message);
             }
@@ -129,7 +152,7 @@ namespace WebAPIDemo.Controllers
         {
             WorkOrder wo = _context.WorkOrder.SingleOrDefault(wo => wo.WorkOrderId.Equals(workOrderId));
 
-            if(wo == null)
+            if (wo == null)
             {
                 return NotFound($"WorkOrder {workOrderId} not found.");
             }
