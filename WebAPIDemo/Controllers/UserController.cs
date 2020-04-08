@@ -52,6 +52,9 @@ namespace WebAPIDemo.Controllers
             if (_context.Users.Where(x => x.Email.Equals(user.Email)).FirstOrDefault() != null)
                 return BadRequest("User already registered.");
 
+            string encrptedPassword = PasswordHelper.Encrypt(user.Password);
+            user.Password = encrptedPassword;
+
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
             return Ok("User registered successfully.");
@@ -80,10 +83,15 @@ namespace WebAPIDemo.Controllers
 
             User user = _context.Users.Where(x => x.Email.Equals(authenticateModel.Email)).FirstOrDefault();
 
-            if (user != null && user.Password.Equals(authenticateModel.Password))
+
+            if (user != null)
             {
-                var token = GenerateToken(user);
-                return Ok(token);
+                string decryptedPassword = PasswordHelper.Decrypt(user.Password);
+                if (decryptedPassword.Equals(authenticateModel.Password))
+                {
+                    var token = GenerateToken(user);
+                    return Ok(token);
+                }
             }
 
             return BadRequest("Invalid email or password.");
