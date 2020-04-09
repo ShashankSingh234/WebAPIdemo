@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace WebAPIDemo.Healpers
+namespace WebAPIDemo.Helpers
 {
     public class Validation
     {

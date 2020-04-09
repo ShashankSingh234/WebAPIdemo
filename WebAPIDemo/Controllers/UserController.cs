@@ -11,12 +11,14 @@ using Microsoft.AspNetCore.Authorization;
 using WebAPIDemo.Models;
 using Microsoft.Extensions.Configuration;
 using WebAPIDemo.Context;
-using WebAPIDemo.Healpers;
+using WebAPIDemo.Helpers;
+using WebAPIDemo.Filters;
 
 namespace WebAPIDemo.Controllers
 {
     [Route("api/[controller]")]
     [Authorize]
+    [ApiKeyAuth]
     [ApiController]
     public class UserController : ControllerBase
     {

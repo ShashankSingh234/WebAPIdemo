@@ -9,12 +9,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using WebAPIDemo.Context;
+using WebAPIDemo.Filters;
 using WebAPIDemo.Models;
 
 namespace WebAPIDemo.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [ApiKeyAuth]
     [Authorize]
     public class WorkOrderController : ControllerBase
     {
