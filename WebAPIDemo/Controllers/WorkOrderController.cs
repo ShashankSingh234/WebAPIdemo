@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
@@ -34,7 +35,7 @@ namespace WebAPIDemo.Controllers
         /// <response code="200">Returns the work order detail.</response>
         /// <response code="404">Work order not found.</response>  
         [HttpGet("GetWorkOrder")]
-        public IActionResult GetWorkOrderDetail(int workOrderId)
+        public IActionResult GetWorkOrderDetail([Required]int workOrderId)
         {
             WorkOrder wo = _context.WorkOrder.SingleOrDefault(wo => wo.WorkOrderId.Equals(workOrderId));
 

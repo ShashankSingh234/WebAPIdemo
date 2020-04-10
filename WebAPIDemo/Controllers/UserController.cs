@@ -54,7 +54,7 @@ namespace WebAPIDemo.Controllers
             if (_context.Users.Where(x => x.Email.Equals(user.Email)).FirstOrDefault() != null)
                 return BadRequest("User already registered.");
 
-            string encrptedPassword = PasswordHelper.Encrypt(user.Password);
+            string encrptedPassword = EncryptionHelper.Encrypt(user.Password);
             user.Password = encrptedPassword;
 
             _context.Users.Add(user);
@@ -88,7 +88,7 @@ namespace WebAPIDemo.Controllers
 
             if (user != null)
             {
-                string decryptedPassword = PasswordHelper.Decrypt(user.Password);
+                string decryptedPassword = EncryptionHelper.Decrypt(user.Password);
                 if (decryptedPassword.Equals(authenticateModel.Password))
                 {
                     var token = GenerateToken(user);

@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using WebAPIDemo.Models;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
@@ -14,6 +13,8 @@ using System.Reflection;
 using System.IO;
 using System;
 using System.Collections.Generic;
+using WebAPIDemo.OperationFilter;
+using WebAPIDemo.Helpers;
 
 namespace WebAPIDemo
 {
@@ -29,6 +30,10 @@ namespace WebAPIDemo
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            //Generate encrypted API key.
+            var time = DateTime.UtcNow.ToString();
+            var encryptedToken = EncryptionHelper.Encrypt(Configuration["ApiKey"] + time);
+
             services.AddDbContext<DatabaseContext>(opt =>
                opt.UseSqlServer(Configuration["DBConnectionString:ConnectionString"]));
             //services.AddDbContext<DatabaseContext>(opt =>
@@ -40,7 +45,7 @@ namespace WebAPIDemo
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Demo API", Version = "v1" });
-                //c.OperationFilter<AuthorizationHeaderParameterOperationFilter>();
+                c.OperationFilter<AuthorizationHeaderParameterOperationFilter>();
 
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {

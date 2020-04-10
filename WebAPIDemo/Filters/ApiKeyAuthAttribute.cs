@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
+using WebAPIDemo.Helpers;
 
 namespace WebAPIDemo.Filters
 {
@@ -21,11 +22,24 @@ namespace WebAPIDemo.Filters
             }
 
             var configuration = context.HttpContext.RequestServices.GetRequiredService<IConfiguration>();
+
             var apiKey = configuration.GetValue<string>("ApiKey");
 
-            if (!apiKey.Equals(potentialApiKey))
+            var decryptedPotentialApiKey = EncryptionHelper.Decrypt(potentialApiKey);
+
+            var potentialSecretKey = decryptedPotentialApiKey.Substring(0, apiKey.Length);
+
+            var requestTime = decryptedPotentialApiKey.Substring(apiKey.Length, decryptedPotentialApiKey.Length - potentialSecretKey.Length);
+
+            if (!apiKey.Equals(potentialSecretKey))
             {
                 context.Result = new UnauthorizedResult();
+                return;
+            }
+
+            if(DateTime.UtcNow - Convert.ToDateTime(requestTime) > TimeSpan.FromSeconds(5))
+            {
+                context.Result = new StatusCodeResult(408);
                 return;
             }
 
