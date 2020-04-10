@@ -34,11 +34,16 @@ namespace WebAPIDemo
             var time = DateTime.UtcNow.ToString();
             var encryptedToken = EncryptionHelper.Encrypt(Configuration["ApiKey"] + time);
 
-            services.AddDbContext<DatabaseContext>(opt =>
-               opt.UseSqlServer(Configuration["DBConnectionString:ConnectionString"]));
+            //Uncomment to use it with SQL server comment line number 44 and 45.
             //services.AddDbContext<DatabaseContext>(opt =>
-            //   opt.UseInMemoryDatabase("DB"));
+            //   opt.UseSqlServer(Configuration["DBConnectionString:ConnectionString"]));
+
+            //Data will be stored till the application is running.
+            services.AddDbContext<DatabaseContext>(opt =>
+               opt.UseInMemoryDatabase("DB"));
+
             SetupJWTServices(services);
+
             services.AddControllers();
 
             // Register the Swagger generator, defining 1 or more Swagger documents

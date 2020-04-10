@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using WebAPIDemo.Context;
 using WebAPIDemo.Filters;
@@ -64,7 +60,7 @@ namespace WebAPIDemo.Controllers
         /// <param name="pageSize">Page size.</param>
         /// <returns></returns>
         [HttpGet("GetWorkOrderList")]
-        public IActionResult GetWorkOrderList(int pageNumber, int pageSize)
+        public IActionResult GetWorkOrderList([Required]int pageNumber, [Required]int pageSize)
         {
             if (pageNumber <= 0)
             {
@@ -151,7 +147,7 @@ namespace WebAPIDemo.Controllers
         /// <param name="workOrderId"></param>
         /// <returns></returns>
         [HttpDelete("Delete")]
-        public async Task<IActionResult> DeleteWorkOrder(int workOrderId)
+        public async Task<IActionResult> DeleteWorkOrder([Required]int workOrderId)
         {
             WorkOrder wo = _context.WorkOrder.SingleOrDefault(wo => wo.WorkOrderId.Equals(workOrderId));
 
